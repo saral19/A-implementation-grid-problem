@@ -1,46 +1,56 @@
 import math
 import numpy as np
 class Node:
-    def __init__(self,x,y,other=None,f=0,g=0,h=0,op=""):
-        self.f = f
-        self.g = g
-        self.h = h
+    def __init__(self,x,y,other=None,op=""):
+        self.f = 0
+        self.g = 0
+        self.h = 0
         self.Operator = op
         self.child = []
         self.parent = other
         self.x = x
         self.y = y
         # self.identifier = ""
+
+    def __eq__(self, other):
+        return (self.x == other.x and self.y == other.y)
+
     def calculateG(self,x,y):
         temp = 0
-        if((y - self.parent.y == 1) and (self.parent.x == 0)):
-            temp = 2
-        if((self.parent.x - 0 == 1) and (self.parent.y == self.parent.x)):
-            temp = 2
-        if((self.parent.y - 0 == 1) and (self.parent.x - 0 == 1)):
-            temp = 1
-        if((self.parent.x - 0 == -1) and (self.parent.y - 0 == 1)):
-            temp = 1
-        if((self.parent.x == 0) and (self.parent.y - 0 == -1)):
-            temp = 2
-        if((self.parent.x - 0 == 1) and (self.parent.y - 0 == -1)):
-            temp = 1
-        if((self.parent.x - 0 == 1) and (self.parent.y - 0 == 1)):
-            temp = 1
-        if((self.parent.x - 0 == -1) and (self.parent.y == self.parent.x)):
-            temp = 2
-        G = self.parent.g + temp
-        self.g = G
+        if(x==0 and y==0):
+            G = 0
+        else:
+            print("Inside G")
+            print("value of x and y ")
+            print(x,y)
+            print("value of parent x and y are")
+            print(self.parent.x,self.parent.y)
+            if((self.x - self.parent.x == 1) and (self.y == self.parent.y)):
+                temp = 2
+            if((self.x == self.parent.x) and (self.y - self.parent.y == 1)):
+                temp = 2
+            if((self.x-self.parent.x == 1) and (self.y-self.parent.y == 1)):
+                temp = 1
+            print("value of temp")
+            print(temp)
+            G = self.parent.g + temp
+        # self.g = G
+        return G
 
     def calculateH(self,x,y):
         a = (x - 2) * (x - 2)
-        b = (y - 2) * (y - 2)
+        b = (y -2) * (y - 2)
         temp = math.sqrt(a + b)
-        self.h = temp
+        # self.h = temp
+        return temp
 
     def calculateF(self):
         temp = self.g + self.h
-        self.f = temp
+        # self.f = temp
+        print("F value of ")
+        print(self.x,self.y)
+        print(temp)
+        return temp
 
     def getOperator(self,x,y):
         if y - self.parent.y == 1 and x == self.parent.x:
@@ -67,28 +77,24 @@ def astar(grid):
     open = []
     closed = []
     startNode = Node(0,0)
-    print("Start node is created")
-    # startNode.x = 0 #need to change this
-    # startNode.y = 0 #need to change this
-    # goalNode = Node(2,2)
-    # goalNode.f = 0
-    # goalNode.g = 0
-    # goalNode.h = 0
-    # goalNode.x = 2 #need to change this
-    # goalNode.y = 2 #need to change this
-    print("Goal node is created")
+    startNode.g = startNode.calculateG(0,0)
+    startNode.h = startNode.calculateH(0,0)
+    startNode.f = startNode.calculateF()
     open.append(startNode)
     while len(open) > 0:
         #code to sort on the basis of f value
         open.sort(key=lambda x:x.f)
         current_node = open.pop(0)
         print("current node poopped out")
+        print(current_node.x,current_node.y)
         closed.append(current_node)
+        print("closed node is")
+        for temp in closed:
+           print(temp.x,temp.y)
         a = current_node.x
         b = current_node.y
         if grid[a][b] == 'G':
             path = []
-            print("inside currentnode =goal node")
             while current_node!=startNode:
                 path.append(current_node.Operator)
                 current_node = current_node.parent
@@ -102,6 +108,8 @@ def astar(grid):
                 continue
             else:
                 validNeighbours.append(n)
+        print("Valid Neighbours are")
+        print(validNeighbours)
         for next in validNeighbours:
             a = next[0]
             b = next[1]
@@ -109,32 +117,46 @@ def astar(grid):
             # put other grid check as well
             print(validNeighbours)
             if(gridValue == 'X'):
-                temp = b+1
-                print(a)
-                print(temp)
-                if((a,temp) in validNeighbours):
-                    validNeighbours.pop((validNeighbours.index(a,temp)))
-                print("Valid Neighbours list is")
-                print(validNeighbours)
+                tempList = validNeighbours.copy()
+                if(x1==a):
+                    temp = a + 1
+                    if((temp,b) in tempList):
+                        validNeighbours.remove((temp,b))
+                    temp = a - 1
+                    if ((temp, b) in tempList):
+                        validNeighbours.remove((temp, b))
+                if(y1==b):
+                    temp = b + 1
+                    if((a,temp) in tempList):
+                        validNeighbours.remove((a,temp))
+                    temp = b - 1
+                    if((a,temp) in tempList):
+                        validNeighbours.remove((a, temp))
                 continue
             newNode = Node(a,b,current_node)
             newNode.setOperator(newNode.getOperator(a, b))
             if newNode in closed:
                 continue
+            if newNode in open:
+                continue
             print("newNode is created for")
-            print(a)
-            print(b)
+            print(newNode.x,newNode.y)
+            newNode.parent = current_node
             current_node.child.append(newNode)
-            newNode.calculateG(a,b)
-            newNode.calculateH(a,b)
-            newNode.calculateF()
-            for node in open:
-                if(newNode == node and newNode.f > node.f):
-                    continue
+            newNode.g = newNode.calculateG(a,b)
+            print("value of G" +str(newNode.g))
+            newNode.h = newNode.calculateH(a,b)
+            print("value of H" + str(newNode.h))
+            newNode.f = newNode.calculateF()
+            print("Value of F" + str(newNode.f))
             open.append(newNode)
+            print("Open list is")
+            for temp in open:
+                print(temp.x,temp.y)
     return None
 
-map = [['S','X','R'],['R','R','R'],['X','R','G']]
+#map = [['S','R','R','X','G'],['R','X','R','X','R'],['R','R','R','X','R'],['X','R','X','R','R'],['R','R','R','R','R']]
+map = [['S','R','R'],['R','R','X'],['R','R','G']]
 listF = np.array(map)
 path = astar(listF)
 print("Saral")
@@ -142,3 +164,4 @@ print()
 print(path)
 print()
 print("Khandelwal")
+print("hello")
