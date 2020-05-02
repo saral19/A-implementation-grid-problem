@@ -38,7 +38,7 @@ class Node:
         return G
 
     def calculateH(self,x,y):
-        a = (x - 2) * (x - 2)
+        a = (x - 0) * (x -0)
         b = (y -2) * (y - 2)
         temp = math.sqrt(a + b)
         # self.h = temp
@@ -155,8 +155,8 @@ def astar(grid):
                 print(temp.x,temp.y)
     return None
 
-#map = [['S','R','R','X','G'],['R','X','R','X','R'],['R','R','R','X','R'],['X','R','X','R','R'],['R','R','R','R','R']]
-map = [['S','R','R'],['R','R','X'],['R','R','G']]
+#map = [['X','R','G','R'],['S','X','R','R'],['R','R','X','X'],['R','R','R','X']]
+map = [['S','X','R'],['R','R','X'],['X','R','G']]
 listF = np.array(map)
 path = astar(listF)
 print("Saral")
