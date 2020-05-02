@@ -95,9 +95,11 @@ def astar(grid,srow,scol,grow,gcol,glength):
         b = current_node.y
         if grid[a][b] == 'G':
             path = []
+            listFinal = []
             path.append('Goal')
             while current_node != startNode:
                 path.append(current_node.Operator)
+                listFinal.append(tuple(current_node.x,current_node.y,current_node.g))
                 current_node = current_node.parent
             path.append('Start')
             path = path[::-1]
